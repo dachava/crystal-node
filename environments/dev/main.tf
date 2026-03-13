@@ -15,7 +15,7 @@ data "aws_lb_listener" "crystal_app" { # Take the ARN, find the listener
   port              = 80
 }
 
-
+### [PROVIDERS] ###
 terraform {
   required_version = ">= 1.5"
 
@@ -24,6 +24,14 @@ terraform {
       source  = "hashicorp/aws"
       version = "~> 5.0"
     }
+    helm = {
+      source  = "hashicorp/helm"
+      version = "~> 2.0"
+    }
+    kubernetes = {
+      source  = "hashicorp/kubernetes"
+      version = "~> 2.0"
+    }
   }
 }
 
@@ -31,6 +39,29 @@ provider "aws" {
   region = var.aws_region
 }
 
+provider "helm" {
+  kubernetes {
+    host                   = module.eks.cluster_endpoint
+    cluster_ca_certificate = base64decode(module.eks.cluster_ca_certificate)
+    exec {
+      api_version = "client.authentication.k8s.io/v1beta1"
+      args        = ["eks", "get-token", "--cluster-name", var.cluster_name]
+      command     = "aws"
+    }
+  }
+}
+
+provider "kubernetes" {
+  host                   = module.eks.cluster_endpoint
+  cluster_ca_certificate = base64decode(module.eks.cluster_ca_certificate)
+  exec {
+    api_version = "client.authentication.k8s.io/v1beta1"
+    args        = ["eks", "get-token", "--cluster-name", var.cluster_name]
+    command     = "aws"
+  }
+}
+
+### [MODULES] ###
 module "vpc" {
   source = "../../modules/vpc"
 
@@ -80,3 +111,21 @@ module "api_gw" {
   tags = local.common_tags
 }
 
+module "lb_controller" {
+  source = "../../modules/lb-controller"
+
+  cluster_name = var.cluster_name
+  aws_region   = var.aws_region
+  vpc_id       = module.vpc.vpc_id
+
+  depends_on = [module.eks] # the entire module needs the EKS cluster to exist before it runs
+}
+
+# Installs the EKS Pod Identity Agent daemonset on every node. 
+# agent that intercepts AWS credential requests from pods and exchanges them with the EKS API
+resource "aws_eks_addon" "pod_identity" {
+  cluster_name = var.cluster_name
+  addon_name   = "eks-pod-identity-agent"
+
+  depends_on = [module.eks]
+}
