@@ -25,5 +25,5 @@ output "bucket_arn" {
 }
 
 output "api_endpoint" {
-  value = module.api_gw.api_endpoint
+  value = var.deploy_api_gw ? module.api_gw[0].api_endpoint : "api_gw not deployed yet"
 }

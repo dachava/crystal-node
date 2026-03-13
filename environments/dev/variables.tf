@@ -40,3 +40,10 @@ variable "max_nodes" {
   type    = number
   default = 4
 }
+
+# Apply step for the NLB
+variable "deploy_api_gw" {
+  description = "Set to true after the NLB is provisioned by kubectl"
+  type        = bool
+  default     = false
+}

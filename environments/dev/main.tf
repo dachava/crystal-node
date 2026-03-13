@@ -5,11 +5,13 @@
 data "aws_caller_identity" "current" {} # Pull the AccountID
 
 data "aws_lb" "crystal_app" { # Fetch my LB for reference
+  count = var.deploy_api_gw ? 1 : 0
   name = "crystal-app-nlb"
 }
 
 data "aws_lb_listener" "crystal_app" { # Take the ARN, find the listener
-  load_balancer_arn = data.aws_lb.crystal_app.arn
+  count = var.deploy_api_gw ? 1 : 0
+  load_balancer_arn = var.deploy_api_gw ? data.aws_lb.crystal_app[0].arn : ""
   port              = 80
 }
 
@@ -66,13 +68,14 @@ module "s3" {
 }
 
 module "api_gw" {
+  count  = var.deploy_api_gw ? 1 : 0
   source = "../../modules/api-gw"
 
   project_name       = var.cluster_name
   environment        = "dev"
   vpc_id             = module.vpc.vpc_id
   private_subnet_ids = module.vpc.private_subnet_ids
-  nlb_listener_arn   = data.aws_lb_listener.crystal_app.arn # my data fetch above
+  nlb_listener_arn   = var.deploy_api_gw ? data.aws_lb_listener.crystal_app[0].arn : "" # my data fetch above
 
   tags = local.common_tags
 }
