@@ -47,3 +47,15 @@ variable "deploy_api_gw" {
   type        = bool
   default     = false
 }
+
+variable "api_id" {
+  description = "API Gateway ID set automatically after api_gw is deployed"
+  type        = string
+  default     = ""
+}
+
+variable "domain_name" {
+  description = "Root domain name for Route53 and ACM"
+  type        = string
+  default     = "chavastyle.com"
+}

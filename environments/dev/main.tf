@@ -129,3 +129,13 @@ resource "aws_eks_addon" "pod_identity" {
 
   depends_on = [module.eks]
 }
+
+module "route53" {
+  count  = var.deploy_api_gw ? 1 : 0 # on/off switch
+  source = "../../modules/route53"
+
+  domain_name = var.domain_name
+  api_id      = var.deploy_api_gw ? module.api_gw[0].api_id : "" # avoid conflict if api_gw=false
+  api_stage   = "dev"
+  tags        = local.common_tags
+}
