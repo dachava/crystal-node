@@ -35,3 +35,11 @@ output "name_servers" {
 output "api_url" {
   value = var.deploy_api_gw ? module.route53[0].api_url : "route53 not deployed yet"
 }
+
+output "grafana_service" {
+  value = module.observability.grafana_service
+}
+
+output "cloudwatch_log_group" {
+  value = module.observability.cloudwatch_log_group
+}

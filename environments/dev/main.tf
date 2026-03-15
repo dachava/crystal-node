@@ -139,3 +139,14 @@ module "route53" {
   api_stage   = "dev"
   tags        = local.common_tags
 }
+
+module "observability" {
+  source = "../../modules/observability"
+
+  cluster_name     = var.cluster_name
+  aws_region       = var.aws_region
+  grafana_password = var.grafana_password
+  tags             = local.common_tags
+
+  depends_on = [module.eks, aws_eks_addon.pod_identity]
+}

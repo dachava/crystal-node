@@ -59,3 +59,9 @@ variable "domain_name" {
   type        = string
   default     = "chavastyle.com"
 }
+
+variable "grafana_password" {
+  description = "Grafana admin password"
+  type        = string
+  sensitive   = true
+}
