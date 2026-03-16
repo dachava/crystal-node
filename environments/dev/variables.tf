@@ -41,7 +41,8 @@ variable "max_nodes" {
   default = 4
 }
 
-# Apply step for the NLB
+### [APPLY step for NLB] ###
+
 variable "deploy_api_gw" {
   description = "Set to true after the NLB is provisioned by kubectl"
   type        = bool
@@ -60,7 +61,7 @@ variable "domain_name" {
   default     = "chavastyle.com"
 }
 
-# Observability
+### [OBSERVABILITY] ###
 
 variable "grafana_password" {
   description = "Grafana admin password"
@@ -68,7 +69,7 @@ variable "grafana_password" {
   sensitive   = true
 }
 
-# Security
+### [SECURITY] ###
 
 variable "db_password" {
   description = "Database password for Secrets Manager"
@@ -92,4 +93,24 @@ variable "app_service_account" {
   description = "Kubernetes service account for the app pods"
   type        = string
   default     = "crystal-app"
+}
+
+### [CI/CD] ###
+
+variable "app_name" {
+  description = "Application name"
+  type        = string
+  default     = "crystal-app"
+}
+
+variable "github_org" {
+  description = "GitHub organization or username"
+  type        = string
+  default     = "dachava"
+}
+
+variable "github_repo" {
+  description = "GitHub repository name"
+  type        = string
+  default     = "crystal-node"
 }

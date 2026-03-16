@@ -163,3 +163,17 @@ module "security" {
 
   depends_on = [module.eks]
 }
+
+module "cicd" {
+  source = "../../modules/cicd"
+
+  cluster_name = var.cluster_name
+  aws_region   = var.aws_region
+  account_id   = data.aws_caller_identity.current.account_id
+  app_name     = var.app_name
+  github_org   = var.github_org
+  github_repo  = var.github_repo
+  tags         = local.common_tags
+
+  depends_on = [module.eks]
+}

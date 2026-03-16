@@ -47,3 +47,11 @@ output "cloudwatch_log_group" {
 output "secret_arn" {
   value = module.security.secret_arn
 }
+
+output "ecr_repository_url" {
+  value = module.cicd.ecr_repository_url
+}
+
+output "github_actions_role_arn" {
+  value = module.cicd.github_actions_role_arn
+}
