@@ -20,7 +20,7 @@ spec:
           type: RuntimeDefault
       containers:
       - name: crystal-app
-        image: 463470958137.dkr.ecr.us-east-1.amazonaws.com/crystal-app:latest
+        image: 463470958137.dkr.ecr.us-east-1.amazonaws.com/crystal-app:0e8fc9c3a4f8b81e6d0f6e249e5097380fb2319e
         ports:
         - containerPort: 8080
         securityContext:
