@@ -43,3 +43,7 @@ output "grafana_service" {
 output "cloudwatch_log_group" {
   value = module.observability.cloudwatch_log_group
 }
+
+output "secret_arn" {
+  value = module.security.secret_arn
+}

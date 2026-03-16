@@ -150,3 +150,16 @@ module "observability" {
 
   depends_on = [module.eks, aws_eks_addon.pod_identity]
 }
+
+module "security" {
+  source = "../../modules/security"
+
+  cluster_name        = var.cluster_name
+  app_namespace       = var.app_namespace
+  app_service_account = var.app_service_account
+  db_password         = var.db_password
+  api_key             = var.api_key
+  tags                = local.common_tags
+
+  depends_on = [module.eks]
+}

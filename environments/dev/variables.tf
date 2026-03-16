@@ -60,8 +60,36 @@ variable "domain_name" {
   default     = "chavastyle.com"
 }
 
+# Observability
+
 variable "grafana_password" {
   description = "Grafana admin password"
   type        = string
   sensitive   = true
+}
+
+# Security
+
+variable "db_password" {
+  description = "Database password for Secrets Manager"
+  type        = string
+  sensitive   = true
+}
+
+variable "api_key" {
+  description = "API key for Secrets Manager"
+  type        = string
+  sensitive   = true
+}
+
+variable "app_namespace" {
+  description = "Kubernetes namespace for the application"
+  type        = string
+  default     = "crystal-app"
+}
+
+variable "app_service_account" {
+  description = "Kubernetes service account for the app pods"
+  type        = string
+  default     = "crystal-app"
 }
