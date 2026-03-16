@@ -32,6 +32,10 @@ terraform {
       source  = "hashicorp/kubernetes"
       version = "~> 2.0"
     }
+    kubectl = {
+      source  = "gavinbunney/kubectl"
+      version = "~> 1.14"
+}
   }
 }
 
@@ -59,6 +63,18 @@ provider "kubernetes" {
     args        = ["eks", "get-token", "--cluster-name", var.cluster_name]
     command     = "aws"
   }
+}
+
+
+provider "kubectl" {
+  host                   = module.eks.cluster_endpoint
+  cluster_ca_certificate = base64decode(module.eks.cluster_ca_certificate)
+  exec {
+    api_version = "client.authentication.k8s.io/v1beta1"
+    args        = ["eks", "get-token", "--cluster-name", var.cluster_name]
+    command     = "aws"
+  }
+  load_config_file = false
 }
 
 ### [MODULES] ###
@@ -174,6 +190,18 @@ module "cicd" {
   github_org   = var.github_org
   github_repo  = var.github_repo
   tags         = local.common_tags
+
+  depends_on = [module.eks]
+}
+
+module "argocd" {
+  source = "../../modules/argocd"
+
+  cluster_name  = var.cluster_name
+  app_name      = var.app_name
+  app_namespace = var.app_namespace
+  github_org    = var.github_org
+  github_repo   = var.github_repo
 
   depends_on = [module.eks]
 }

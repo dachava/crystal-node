@@ -55,3 +55,7 @@ output "ecr_repository_url" {
 output "github_actions_role_arn" {
   value = module.cicd.github_actions_role_arn
 }
+
+output "argocd_service" {
+  value = module.argocd.argocd_service
+}

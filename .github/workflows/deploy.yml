@@ -38,16 +38,14 @@ jobs:
           docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
           docker push $ECR_REGISTRY/$ECR_REPOSITORY:latest
 
-      - name: Update kubeconfig
-        run: |
-          aws eks update-kubeconfig --region us-east-1 --name crystal-cluster
-
-      - name: Deploy to EKS
+      - name: Update image tag in manifest
         env:
           ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
           IMAGE_TAG: ${{ github.sha }}
         run: |
-          kubectl set image deployment/crystal-app \
-            crystal-app=$ECR_REGISTRY/crystal-app:$IMAGE_TAG \
-            -n crystal-app
-          kubectl rollout status deployment/crystal-app -n crystal-app
+          sed -i "s|image:.*|image: $ECR_REGISTRY/crystal-app:$IMAGE_TAG|g" k8s/app.yaml
+          git config user.name "github-actions"
+          git config user.email "github-actions@github.com"
+          git add k8s/app.yaml
+          git commit -m "ci: update image tag to $IMAGE_TAG"
+          git push
