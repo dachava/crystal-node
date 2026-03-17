@@ -60,7 +60,7 @@ resource "kubectl_manifest" "argocd_app" {
       source = {
         repoURL        = "https://github.com/${var.github_org}/${var.github_repo}" # points Argo to the repo
         targetRevision = "master" # watches the master branch
-        path           = "k8s" # watches the k8s/ directory specifically
+        path           = "k8s/crystal-app" # watches the k8s/ directory specifically
       }
 
       destination = {
@@ -74,6 +74,41 @@ resource "kubectl_manifest" "argocd_app" {
           selfHeal = true # ArgoCD automatically reverts manual changes in cluster that differ from git
         }
         syncOptions = ["CreateNamespace=true"] # ArgoCD creates the namespace if it doesn't exist
+      }
+    }
+  })
+
+  depends_on = [helm_release.argocd]
+}
+
+resource "kubectl_manifest" "argocd_fit_link" {
+  yaml_body = yamlencode({
+    apiVersion = "argoproj.io/v1alpha1"
+    kind       = "Application"
+    metadata = {
+      name      = "fit-link"
+      namespace = "argocd"
+    }
+    spec = {
+      project = "default"
+
+      source = {
+        repoURL        = "https://github.com/${var.github_org}/${var.github_repo}"
+        targetRevision = "master"
+        path           = "k8s/fit-link"
+      }
+
+      destination = {
+        server    = "https://kubernetes.default.svc"
+        namespace = "fit-link"
+      }
+
+      syncPolicy = {
+        automated = {
+          prune    = true
+          selfHeal = true
+        }
+        syncOptions = ["CreateNamespace=true"]
       }
     }
   })
