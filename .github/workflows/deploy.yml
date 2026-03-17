@@ -43,10 +43,10 @@ jobs:
           ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
           IMAGE_TAG: ${{ github.sha }}
         run: |
-          sed -i "s|image:.*|image: $ECR_REGISTRY/crystal-app:$IMAGE_TAG|g" k8s/app.yaml
+          sed -i "s|image:.*|image: $ECR_REGISTRY/crystal-app:$IMAGE_TAG|g" k8s/crystal-app/app.yaml
           git config user.name "github-actions"
           git config user.email "github-actions@github.com"
           git remote set-url origin https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}
-          git add k8s/app.yaml
+          git add k8s/crystal-app/app.yaml
           git commit -m "ci: update image tag to $IMAGE_TAG"
           git push
