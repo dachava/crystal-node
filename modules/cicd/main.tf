@@ -98,9 +98,12 @@ resource "aws_iam_role" "github_actions" {
           "token.actions.githubusercontent.com:aud" = "sts.amazonaws.com"
         }
         # allows any branch or event only on the specific repo to assume this role
-        StringLike = { # StringLike with * wildcard handles all cases
-          "token.actions.githubusercontent.com:sub" = "repo:${var.github_org}/${var.github_repo}:*"
-        }
+        StringLike = {
+  "token.actions.githubusercontent.com:sub" = [
+    "repo:${var.github_org}/${var.github_repo}:*",
+    "repo:${var.github_org}/fit-link:*"
+  ]
+}
       }
     }]
   })
