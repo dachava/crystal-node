@@ -13,11 +13,42 @@ resource "aws_ecr_repository" "app" {
   tags = var.tags
 }
 
+resource "aws_ecr_repository" "fit_link" {
+  name                 = "fit-link"
+  image_tag_mutability = "MUTABLE"
+  force_delete         = true
+
+  image_scanning_configuration {
+    scan_on_push = true
+  }
+
+  tags = var.tags
+}
+
 # Lifecycle policy
 # Without this, ECR accumulates every image ever pushed
 # Useful to cap storage costs ex. last N images based on how far back it's needed to roll back
 resource "aws_ecr_lifecycle_policy" "app" {
   repository = aws_ecr_repository.app.name
+
+  policy = jsonencode({
+    rules = [{
+      rulePriority = 1
+      description  = "Keep last 10 images"
+      selection = {
+        tagStatus   = "any"
+        countType   = "imageCountMoreThan"
+        countNumber = 10
+      }
+      action = {
+        type = "expire"
+      }
+    }]
+  })
+}
+
+resource "aws_ecr_lifecycle_policy" "fit_link" {
+  repository = aws_ecr_repository.fit_link.name
 
   policy = jsonencode({
     rules = [{
@@ -100,7 +131,10 @@ resource "aws_iam_policy" "github_actions" {
           "ecr:UploadLayerPart",
           "ecr:CompleteLayerUpload"
         ]
-        Resource = aws_ecr_repository.app.arn # push permissions on the specific repo ARN
+         Resource = [ # push permissions on the specific repo ARN
+    aws_ecr_repository.app.arn, 
+    aws_ecr_repository.fit_link.arn
+  ] 
       },
       {
         Effect = "Allow"
