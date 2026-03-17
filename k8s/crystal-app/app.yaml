@@ -20,7 +20,9 @@ spec:
           type: RuntimeDefault
       containers:
       - name: crystal-app
+<<<<<<< HEAD:k8s/app.yaml
         image: 463470958137.dkr.ecr.us-east-1.amazonaws.com/crystal-app:98bf6ba8dc5e1b03cc2423b3b82c7564134564d1
+=======
         ports:
         - containerPort: 8080
         securityContext:
