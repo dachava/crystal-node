@@ -20,7 +20,7 @@ spec:
           type: RuntimeDefault
       containers:
       - name: fit-link
-        image: 463470958137.dkr.ecr.us-east-1.amazonaws.com/fit-link:latest
+        image: 463470958137.dkr.ecr.us-east-1.amazonaws.com/fit-link:2d6d65e8e765c26afa6f6b1f783af1c7edfa3190
         ports:
         - containerPort: 8080
         securityContext:
