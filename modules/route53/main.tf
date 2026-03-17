@@ -1,12 +1,11 @@
-resource "aws_route53_zone" "main" {
+data "aws_route53_zone" "main" {
   name = var.domain_name
-
-  tags = var.tags
+  zone_id = var.zone_id
 }
 
 # ACM Certificate
 resource "aws_acm_certificate" "main" {
-  domain_name       = "api.${var.domain_name}" # requests a cert specifically for subdomain
+  domain_name       = "${var.subdomain}.${var.domain_name}" # requests a cert specifically for subdomain
   validation_method = "DNS" # proves ownership with DNS record
 
   lifecycle {
@@ -27,8 +26,8 @@ resource "aws_route53_record" "cert_validation" {
       record = dvo.resource_record_value
     }
   }
-
-  zone_id = aws_route53_zone.main.zone_id
+  allow_overwrite = true
+  zone_id = data.aws_route53_zone.main.zone_id
   name    = each.value.name
   type    = each.value.type
   records = [each.value.record]
@@ -46,7 +45,7 @@ resource "aws_acm_certificate_validation" "main" {
 # API Gateway CUstom Domain
 # without this, API Gateway only responds to its auto-generated URL
 resource "aws_apigatewayv2_domain_name" "main" {
-  domain_name = "api.${var.domain_name}" # REgisters custom domain
+  domain_name = "${var.subdomain}.${var.domain_name}" # REgisters custom domain
 
   domain_name_configuration {
     certificate_arn = aws_acm_certificate.main.arn
@@ -65,8 +64,9 @@ resource "aws_apigatewayv2_api_mapping" "main" {
 }
 
 resource "aws_route53_record" "api" {
-  zone_id = aws_route53_zone.main.zone_id
-  name    = "api.${var.domain_name}"
+  allow_overwrite = true
+  zone_id = data.aws_route53_zone.main.zone_id
+  name    = "${var.subdomain}.${var.domain_name}"
   type    = "A"
 
     # alias record points to another AWS resource instead of IP

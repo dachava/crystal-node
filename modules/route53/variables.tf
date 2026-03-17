@@ -18,3 +18,15 @@ variable "tags" {
   type    = map(string)
   default = {}
 }
+
+variable "subdomain" {
+  description = "Subdomain prefix a.k.a 'api' for api.chavastyle.com, 'fit' for fit.chavastyle.com, etc."
+  type        = string
+  default     = "api"
+}
+
+variable "zone_id" {
+  description = "Route53 hosted zone ID prevents duplicate zone matches"
+  type        = string
+  default     = "Z09894022ZLA9EVZFW21P"
+}

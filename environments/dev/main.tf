@@ -3,7 +3,7 @@
 
 ### [DATA] ###
 data "aws_caller_identity" "current" {} # Pull the AccountID
-
+# Crystal App API
 data "aws_lb" "crystal_app" { # Fetch my LB for reference
   count = var.deploy_api_gw ? 1 : 0
   name = "crystal-app-nlb"
@@ -14,6 +14,20 @@ data "aws_lb_listener" "crystal_app" { # Take the ARN, find the listener
   load_balancer_arn = var.deploy_api_gw ? data.aws_lb.crystal_app[0].arn : ""
   port              = 80
 }
+
+# Fit-Link API
+data "aws_lb" "fit_link" {
+  count = var.deploy_api_gw ? 1 : 0
+  name  = "fit-link-nlb"
+}
+
+data "aws_lb_listener" "fit_link" {
+  count             = var.deploy_api_gw ? 1 : 0
+  load_balancer_arn = var.deploy_api_gw ? data.aws_lb.fit_link[0].arn : ""
+  port              = 80
+}
+
+
 
 ### [PROVIDERS] ###
 terraform {
@@ -127,6 +141,19 @@ module "api_gw" {
   tags = local.common_tags
 }
 
+module "api_gw_fit_link" {
+  count  = var.deploy_api_gw ? 1 : 0
+  source = "../../modules/api-gw"
+
+  project_name       = "fit-link"
+  environment        = "dev"
+  vpc_id             = module.vpc.vpc_id
+  private_subnet_ids = module.vpc.private_subnet_ids
+  nlb_listener_arn   = data.aws_lb_listener.fit_link[0].arn
+
+  tags = local.common_tags
+}
+
 module "lb_controller" {
   source = "../../modules/lb-controller"
 
@@ -151,7 +178,19 @@ module "route53" {
   source = "../../modules/route53"
 
   domain_name = var.domain_name
+  subdomain   = "api"
   api_id      = var.deploy_api_gw ? module.api_gw[0].api_id : "" # avoid conflict if api_gw=false
+  api_stage   = "dev"
+  tags        = local.common_tags
+}
+
+module "route53_fit_link" {
+  count  = var.deploy_api_gw ? 1 : 0
+  source = "../../modules/route53"
+
+  domain_name = var.domain_name
+  subdomain   = "fit"
+  api_id      = module.api_gw_fit_link[0].api_id
   api_stage   = "dev"
   tags        = local.common_tags
 }

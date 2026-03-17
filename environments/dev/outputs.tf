@@ -28,12 +28,16 @@ output "api_endpoint" {
   value = var.deploy_api_gw ? module.api_gw[0].api_endpoint : "api_gw not deployed yet"
 }
 
-output "name_servers" {
-  value = var.deploy_api_gw ? module.route53[0].name_servers : []
-}
+# output "name_servers" {
+#   value = var.deploy_api_gw ? module.route53[0].name_servers : []
+# }
 
 output "api_url" {
   value = var.deploy_api_gw ? module.route53[0].api_url : "route53 not deployed yet"
+}
+
+output "fit_link_url" {
+  value = var.deploy_api_gw ? module.route53_fit_link[0].api_url : "not deployed yet"
 }
 
 output "grafana_service" {
