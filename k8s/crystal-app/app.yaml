@@ -21,7 +21,7 @@ spec:
       containers:
       - name: crystal-app
 <<<<<<< HEAD:k8s/app.yaml
-        image: 463470958137.dkr.ecr.us-east-1.amazonaws.com/crystal-app:ae75ce84f64e5b6e3f2b28cb7cadb8e5ad2b748f
+        image: 463470958137.dkr.ecr.us-east-1.amazonaws.com/crystal-app:1f222af93dea3207cb61c0e9526c6f73190d0859
 =======
         ports:
         - containerPort: 8080
