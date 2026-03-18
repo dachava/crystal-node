@@ -5,6 +5,7 @@
 resource "aws_ecr_repository" "app" {
   name                 = var.app_name
   image_tag_mutability = "MUTABLE" # For lab MUTABLE, IMMUTABLE use tags with the git SHA as the tag
+  force_delete = true
 
   image_scanning_configuration {
     scan_on_push = true # every image pushed to ECR gets scanned for known CVEs auto
