@@ -95,6 +95,20 @@ variable "app_service_account" {
   default     = "crystal-app"
 }
 
+### [FIT-LINK RDS] ###
+
+variable "fit_link_db_password" {
+  description = "Master password for the fit-link RDS instance"
+  type        = string
+  sensitive   = true
+}
+
+variable "fit_link_secret_key" {
+  description = "Application SECRET_KEY for fit-link stored in Secrets Manager"
+  type        = string
+  sensitive   = true
+}
+
 ### [CI/CD] ###
 
 variable "app_name" {

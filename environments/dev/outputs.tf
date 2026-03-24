@@ -63,3 +63,18 @@ output "github_actions_role_arn" {
 output "argocd_service" {
   value = module.argocd.argocd_service
 }
+
+output "fit_link_secret_arn" {
+  description = "Secrets Manager ARN for fit-link app secrets"
+  value       = module.rds.secret_arn
+}
+
+output "fit_link_db_endpoint" {
+  description = "fit-link RDS endpoint"
+  value       = module.rds.db_endpoint
+}
+
+output "fit_link_role_arn" {
+  description = "IAM role ARN for fit-link Pod Identity"
+  value       = module.rds.fit_link_role_arn
+}

@@ -92,11 +92,13 @@ This creates the S3 state bucket and DynamoDB lock table and generates `environm
 Create `environments/dev/terraform.tfvars` with the following. This file is gitignored and must never be committed.
 
 ```hcl
-grafana_password = "yourpassword"
-db_password      = "yourdbpassword"
-api_key          = "yourapikey"
-github_org       = "your-github-username"
-github_repo      = "crystal-node"
+grafana_password     = "yourpassword"
+db_password          = "yourdbpassword"
+api_key              = "yourapikey"
+github_org           = "your-github-username"
+github_repo          = "crystal-node"
+fit_link_db_password = "yourfitlinkdbpassword"
+fit_link_secret_key  = "yourfitlinksecretkey"
 ```
 
 ---
@@ -124,6 +126,17 @@ aws eks update-kubeconfig --region us-east-1 --name crystal-cluster
 # Deploy applications: this triggers NLB provisioning
 kubectl apply -f k8s/crystal-app/app.yaml
 kubectl apply -f k8s/fit-link/deployment.yaml
+
+# Bridge Secrets Manager → Kubernetes for fit-link
+# The pods expect a K8s Secret named fit-link-secrets before they will start.
+# The namespace is created by the apply above, so run this immediately after.
+SECRET=$(aws secretsmanager get-secret-value \
+  --secret-id crystal-cluster/fit-link/app-secrets \
+  --query SecretString --output text)
+
+kubectl create secret generic fit-link-secrets -n fit-link \
+  --from-literal=DATABASE_URL="$(echo $SECRET | jq -r .DATABASE_URL)" \
+  --from-literal=SECRET_KEY="$(echo $SECRET | jq -r .SECRET_KEY)"
 
 # Wait for NLBs to provision: watch for EXTERNAL-IP to appear
 kubectl get svc -n crystal-app -w
@@ -219,6 +232,8 @@ Container logs, performance metrics, and host metrics are shipped to CloudWatch 
 ---
 
 ## Known issues and workarounds
+
+See `docs/04-troubleshooting.md` for the full list. The most common issues:
 
 **ImagePullBackOff after fresh deploy**: ECR is empty because the pipeline hasn't run yet. Trigger it with an empty commit or push any change to master.
 

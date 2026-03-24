@@ -1,3 +1,9 @@
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: fit-link
+  namespace: fit-link
+---
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -13,6 +19,7 @@ spec:
       labels:
         app: fit-link
     spec:
+      serviceAccountName: fit-link
       securityContext:
         runAsNonRoot: true
         runAsUser: 1000
@@ -23,6 +30,18 @@ spec:
         image: 463470958137.dkr.ecr.us-east-1.amazonaws.com/fit-link:2d6d65e8e765c26afa6f6b1f783af1c7edfa3190
         ports:
         - containerPort: 8080
+        env:
+        # Values populated from AWS Secrets Manager via fit-link-secrets K8s Secret
+        - name: DATABASE_URL
+          valueFrom:
+            secretKeyRef:
+              name: fit-link-secrets
+              key: DATABASE_URL
+        - name: SECRET_KEY
+          valueFrom:
+            secretKeyRef:
+              name: fit-link-secrets
+              key: SECRET_KEY
         securityContext:
           allowPrivilegeEscalation: false
           capabilities:
